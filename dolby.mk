@@ -31,8 +31,10 @@ TARGET_HAS_DOLBY_VISION ?= false
 
 # SEPolicy
 BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor
+BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor/aidl
 ifeq ($(TARGET_HAS_DOLBY_VISION),true)
 BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor/vision
+BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor/aidl/vision
 endif
 
 # HIDL
