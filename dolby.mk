@@ -24,9 +24,16 @@ PRODUCT_SOONG_NAMESPACES += \
 # Enable codec support
 AUDIO_FEATURE_ENABLED_DS2_DOLBY_DAP := true
 
+# Dolby Vision is opt-in per device. Devices without a DV-capable display
+# pipeline (e.g. alioth) must leave this false so the DV codec stack, HAL
+# service and sepolicy are neither built nor shipped.
+TARGET_HAS_DOLBY_VISION ?= false
+
 # SEPolicy
 BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor
+ifeq ($(TARGET_HAS_DOLBY_VISION),true)
 BOARD_VENDOR_SEPOLICY_DIRS += $(DOLBY_PATH)/sepolicy/vendor/vision
+endif
 
 # HIDL
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += $(DOLBY_PATH)/dolby_framework_matrix.xml
@@ -36,8 +43,13 @@ PRODUCT_PACKAGES += \
     vendor.dolby.media.c2.xml
     
 # Configs
+ifeq ($(TARGET_HAS_DOLBY_VISION),true)
+PRODUCT_COPY_FILES += \
+    $(DOLBY_PATH)/proprietary/vendor/etc/media_codecs_dolby_audio_vision.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_dolby_audio.xml
+else
 PRODUCT_COPY_FILES += \
     $(DOLBY_PATH)/proprietary/vendor/etc/media_codecs_dolby_audio.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_dolby_audio.xml
+endif
 
 PRODUCT_COPY_FILES += \
     $(DOLBY_PATH)/proprietary/vendor/etc/dolby/dax-default-spatializer.xml:$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default-spatializer.xml \
@@ -140,6 +152,7 @@ PRODUCT_PACKAGES += \
     vendor.dolby.media.c2@1.0-service
 
 # Dolby vision Proprietary blobs
+ifeq ($(TARGET_HAS_DOLBY_VISION),true)
 PRODUCT_COPY_FILES += \
     $(DOLBY_PATH)/proprietary/vendor/etc/dolby_vision.cfg:$(TARGET_COPY_OUT_VENDOR)/etc/dolby_vision.cfg \
     $(DOLBY_PATH)/proprietary/vendor/etc/init/vendor.dolbyvision.media.c2@1.0-service.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/vendor.dolbyvision.media.c2@1.0-service.rc
@@ -171,4 +184,5 @@ PRODUCT_PACKAGES += \
 # Shim
 PRODUCT_PACKAGES += \
     libcodec2_hidl_shim.vendor
+endif
 
